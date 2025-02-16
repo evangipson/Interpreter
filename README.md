@@ -10,6 +10,7 @@ The purpose is to mitigate the need to rebuild or redeploy the .NET application 
 - Run `dotnet run`
 
 ## Development
+- Hit `/scalar/v1` to see Scalar OpenAPI docs
 - Change or create any behaviors in the `scripts` directory
 - Create a new controller endpoint in the `src\Interpreter.API\Controllers\ScriptsController.cs` file to call that script
 - Note: To change the `scripts` location, update the application settings
