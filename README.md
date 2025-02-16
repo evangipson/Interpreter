@@ -11,6 +11,6 @@ The purpose is to mitigate the need to rebuild or redeploy the .NET application 
 
 ## Development
 - Hit `/scalar/v1` to see Scalar OpenAPI docs
+- The `scripts` directory can be customized from the application settings
 - Change or create any behaviors in the `scripts` directory
-- Create a new controller endpoint in the `src\Interpreter.API\Controllers\ScriptsController.cs` file to call that script
-- Note: To change the `scripts` location, update the application settings
+    - When creating a new behavior, create a new controller endpoint in `src\Interpreter.API\Controllers\ScriptsController.cs` to see the new behavior
