@@ -29,4 +29,4 @@ Inside the `scripts` directory, there are many directories and lua files which a
 - The `scripts` directory location can be customized from the application settings
 - Change any lua script in the `scripts` directory to change application logic in realtime
 - Create any new directories and lua scripts in the `scripts` directory to extend application logic
-    - Create a new controller endpoint in `src\Interpreter.API\Controllers\ScriptsController.cs` to see the new behavior, or use the existing `/scripts/run`/`/scripts/run-async` endpoints to invoke the new script
+    - After creating the new script, add a new controller endpoint in the `Interpreter.API` project (or use the existing `/scripts/run` or `/scripts/run-async` endpoints) to invoke the new script
