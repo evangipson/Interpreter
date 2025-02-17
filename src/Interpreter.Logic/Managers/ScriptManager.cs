@@ -2,16 +2,30 @@
 
 using Interpreter.Logic.Services;
 
-namespace Interpreter.Logic.Managers
-{
-    public class ScriptManager(ISettingsService settingsService, IScriptService scriptService) : IScriptManager
-    {
-        private string ScriptPath => settingsService.ScriptRootPath;
+namespace Interpreter.Logic.Managers;
 
-        public Task<TResult?> GetResult<TResult>(string scriptRelativePath, string functionName, IEnumerable<LuaValue> arguments)
+/// <inheritdoc cref="IScriptManager"/>
+public class ScriptManager(ISettingsService settingsService, IScriptService scriptService) : IScriptManager
+{
+    private string ScriptPath => settingsService.ScriptRootPath;
+
+    public bool TryGetResult<TResult>(string scriptRelativePath, IEnumerable<LuaValue> arguments, out TResult? result)
+    {
+        var scriptPath = Path.Combine(ScriptPath, scriptRelativePath);
+
+        result = default;
+        if(!scriptService.TryGetResult(scriptPath, arguments, out TResult? scriptResult))
         {
-            var scriptPath = Path.Combine(ScriptPath, scriptRelativePath);
-            return scriptService.GetResult<TResult>(scriptPath, functionName, arguments);
+            return false;
         }
+
+        result = scriptResult;
+        return true;
+    }
+
+    public Task<TResult?> GetResultAsync<TResult>(string scriptRelativePath, IEnumerable<LuaValue> arguments)
+    {
+        var scriptPath = Path.Combine(ScriptPath, scriptRelativePath);
+        return scriptService.GetResultAsync<TResult>(scriptPath, arguments);
     }
 }

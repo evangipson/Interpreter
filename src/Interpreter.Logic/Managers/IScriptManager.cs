@@ -1,9 +1,17 @@
 ﻿using Lua;
 
-namespace Interpreter.Logic.Managers
+using Interpreter.Logic.Services;
+
+namespace Interpreter.Logic.Managers;
+
+/// <summary>
+/// A manager that is responsible for loading and running scripts that are located in a directory defined in the application settings.
+/// </summary>
+public interface IScriptManager
 {
-    public interface IScriptManager
-    {
-        Task<TResult?> GetResult<TResult>(string scriptRelativePath, string functionName, IEnumerable<LuaValue> arguments);
-    }
+    /// <inheritdoc cref="IScriptService.TryGetResult"/>
+    bool TryGetResult<TResult>(string scriptRelativePath, IEnumerable<LuaValue> arguments, out TResult? result);
+
+    /// <inheritdoc cref="IScriptService.GetResultAsync"/>
+    Task<TResult?> GetResultAsync<TResult>(string scriptRelativePath, IEnumerable<LuaValue> arguments);
 }
