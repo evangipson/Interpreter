@@ -10,8 +10,11 @@ namespace Interpreter.Logic.Managers;
 public interface IScriptManager
 {
     /// <inheritdoc cref="IScriptService.TryGetResult"/>
+    bool TryGetResult<TResult>(string scriptRelativePath, out TResult? result);
+
+    /// <inheritdoc cref="IScriptService.TryGetResult"/>
     bool TryGetResult<TResult>(string scriptRelativePath, IEnumerable<LuaValue> arguments, out TResult? result);
 
     /// <inheritdoc cref="IScriptService.GetResultAsync"/>
-    Task<TResult?> GetResultAsync<TResult>(string scriptRelativePath, IEnumerable<LuaValue> arguments);
+    Task<TResult?> GetResultAsync<TResult>(string scriptRelativePath, IEnumerable<LuaValue>? arguments = null);
 }

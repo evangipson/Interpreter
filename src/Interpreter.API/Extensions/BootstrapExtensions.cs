@@ -28,9 +28,9 @@ internal static class BootstrapExtensions
             .Configure<RouteOptions>(options => options.LowercaseUrls = true)
             .AddOpenApi()
             .AddAuthorization()
-            .AddScoped<ISettingsService, SettingsService>()
-            .AddScoped<IScriptService, ScriptService>()
-            .AddScoped<IScriptManager, ScriptManager>()
+            .AddSingleton<ISettingsService, SettingsService>()
+            .AddSingleton<IScriptService, ScriptService>()
+            .AddSingleton<IScriptManager, ScriptManager>()
             .AddControllers();
 
         return builder;

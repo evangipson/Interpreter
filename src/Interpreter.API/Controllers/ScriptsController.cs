@@ -15,16 +15,24 @@ public class ScriptsController(IScriptManager scriptManager) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [EndpointDescription("An example of a generic, synchronous call to any script with any number of arguments, and receiving a generic value.")]
-    public object? Run(string scriptRelativePath, [FromBody] IEnumerable<string> arguments) =>
-        scriptManager.TryGetResult(scriptRelativePath, [.. arguments], out object? result) ? result : default;
+    public dynamic? Run(string scriptRelativePath, [FromBody] IEnumerable<string>? arguments = null)
+    {
+        if(arguments?.Any() == true)
+        {
+            return scriptManager.TryGetResult(scriptRelativePath, [.. arguments], out dynamic? argsResult) ? argsResult : default;
+        }
+
+        return scriptManager.TryGetResult(scriptRelativePath, out dynamic? result) ? result : default;
+    }
 
     [HttpPost]
     [Route("run-async")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [EndpointDescription("An example of a generic, asynchronous call to any script with any number of arguments, and receiving a task with a generic value.")]
-    public async Task<object?> RunAsync(string scriptRelativePath, [FromBody] IEnumerable<string> arguments) =>
-        await scriptManager.GetResultAsync<object>(scriptRelativePath, [.. arguments]);
+    public async Task<dynamic?> RunAsync(string scriptRelativePath, [FromBody] IEnumerable<string>? arguments = null) => arguments?.Any() == true
+        ? await scriptManager.GetResultAsync<dynamic>(scriptRelativePath, [.. arguments])
+        : await scriptManager.GetResultAsync<dynamic>(scriptRelativePath);
 
     [HttpGet]
     [Route("[action]")]
@@ -38,7 +46,7 @@ public class ScriptsController(IScriptManager scriptManager) : ControllerBase
     [Route("[action]")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [EndpointDescription("An example of an asynchronous call to a specific script with a specific argument, and receiving a task with a value of a specific type.")]
-    public async Task<string?> Loot(string monsterType) =>
-        await scriptManager.GetResultAsync<string>("loot/get_loot.lua", [monsterType]);
+    [EndpointDescription("An example of an asynchronous call to a specific script with no argument, and receiving a task with a value of a specific type.")]
+    public async Task<string?> Version() =>
+        await scriptManager.GetResultAsync<string>("config/get_version.lua");
 }
