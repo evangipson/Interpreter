@@ -76,4 +76,15 @@ public interface IScriptService
     /// The results of the <paramref name="script"/>, as a <see cref="ValueTask"/> with a collection of <see cref="LuaValue"/>.
     /// </returns>
     ValueTask<LuaValue[]> RunAsync(string script);
+
+    /// <summary>
+    /// Adds a value to the lua environment's globals, to be accessed from lua.
+    /// </summary>
+    /// <param name="name">
+    /// The name of the lua entity to add to globals.
+    /// </param>
+    /// <param name="value">
+    /// The value of the lua entity to add to globals.
+    /// </param>
+    void AddToGlobals(string name, LuaValue value);
 }

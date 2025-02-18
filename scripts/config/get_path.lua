@@ -1,4 +1,4 @@
-local app_settings = require('..\\..\\scripts\\app_settings')
+local app_settings = require(INCLUDE_PATH() .. '\\app_settings')
 
 local function get_path()
     if app_settings.path == nil then

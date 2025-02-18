@@ -1,4 +1,4 @@
-local app_settings = require('..\\..\\scripts\\app_settings')
+local app_settings = require(INCLUDE_PATH() .. '\\app_settings')
 
 local function get_version()
     if app_settings.version == nil then

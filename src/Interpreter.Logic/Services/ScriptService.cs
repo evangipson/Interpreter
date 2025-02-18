@@ -62,6 +62,17 @@ public class ScriptService(ILogger<ScriptService> logger) : IScriptService
         return _luaState.DoStringAsync(script);
     }
 
+    public void AddToGlobals(string name, LuaValue value)
+    {
+        logger.LogInformation(@$"{nameof(AddToGlobals)}: Adding ""{name}"" to the lua globals, which is a function with the return value of ""{value}"".");
+        _luaState.Environment[name] = new LuaFunction((context, buffer, ct) =>
+        {
+            buffer.Span[0] = value;
+
+            return new(1);
+        });
+    }
+
     private async Task<TResult?> InvokeScriptAsync<TResult>(string scriptPath, IEnumerable<LuaValue>? arguments = null)
     {
         // Make sure the script exists before attempting to run it.

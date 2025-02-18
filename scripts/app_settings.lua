@@ -5,7 +5,7 @@ local app_settings = {
     version = "0.1.0",
     languages = { "C#", "lua" },
     environment = os_getenv("ASPNETCORE_ENVIRONMENT"),
-    path = os_getenv("SCRIPTS_PATH") -- SCRIPTS_PATH env variable is set in the SettingsService
+    path = SCRIPTS_PATH()
 }
 
 return app_settings

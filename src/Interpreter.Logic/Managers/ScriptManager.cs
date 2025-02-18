@@ -12,7 +12,7 @@ public class ScriptManager(ISettingsService settingsService, IScriptService scri
     {
         get
         {
-            //Task.Run(AddScriptRootPathToPackagePath);
+            AddPathInformationToGlobals();
             return _scriptPath ??= settingsService.ScriptRootPath;
         }
     }
@@ -51,22 +51,24 @@ public class ScriptManager(ISettingsService settingsService, IScriptService scri
         return scriptService.GetResultAsync<TResult>(scriptPath, arguments ?? []);
     }
 
-    //private async Task AddScriptRootPathToPackagePath()
-    //{
-    //    // Don't set package.path if it's already been set, i.e.: the script path has been loaded.
-    //    if (!string.IsNullOrWhiteSpace(_scriptPath))
-    //    {
-    //        return;
-    //    }
+    private void AddPathInformationToGlobals()
+    {
+        // Don't set globals if they've already been set, i.e.: the script path has been loaded.
+        if (!string.IsNullOrWhiteSpace(_scriptPath))
+        {
+            return;
+        }
 
-    //    // Don't set package.path if there is no script root path from the settings service.
-    //    if (string.IsNullOrWhiteSpace(settingsService.ScriptRootPath))
-    //    {
-    //        return;
-    //    }
+        // Don't set globals if there is no script root path from the settings service.
+        if (string.IsNullOrWhiteSpace(settingsService.ScriptRootPath))
+        {
+            return;
+        }
 
-    //    // TODO: find out why package.path isn't being set properly
-    //    var fullScriptPath = Path.GetFullPath(settingsService.ScriptRootPath).Replace("\\", "\\\\");
-    //    await scriptService.RunAsync(@$"package.path = package.path .. "";{fullScriptPath}\\?.lua""");
-    //}
+        var fullScriptPath = Path.GetFullPath(settingsService.ScriptRootPath).Replace("\\", "\\\\");
+        scriptService.AddToGlobals("SCRIPTS_PATH", fullScriptPath);
+
+        var relativeScriptPath = Path.GetRelativePath(Environment.CurrentDirectory, fullScriptPath).Replace("\\", "\\\\");
+        scriptService.AddToGlobals("INCLUDE_PATH", relativeScriptPath);
+    }
 }
