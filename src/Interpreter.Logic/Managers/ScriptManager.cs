@@ -51,6 +51,8 @@ public class ScriptManager(ISettingsService settingsService, IScriptService scri
         return scriptService.GetResultAsync<TResult>(scriptPath, arguments ?? []);
     }
 
+    public Dictionary<LuaValue, LuaValue> GetValuesFromTable(LuaTable luaTable) => scriptService.GetValuesFromTable(luaTable);
+
     private void AddPathInformationToGlobals()
     {
         // Don't set globals if they've already been set, i.e.: the script path has been loaded.
@@ -66,9 +68,9 @@ public class ScriptManager(ISettingsService settingsService, IScriptService scri
         }
 
         var fullScriptPath = Path.GetFullPath(settingsService.ScriptRootPath).Replace("\\", "\\\\");
-        scriptService.AddToGlobals("SCRIPTS_PATH", fullScriptPath);
+        Environment.SetEnvironmentVariable("Interpreter:ScriptsPath", fullScriptPath);
 
         var relativeScriptPath = Path.GetRelativePath(Environment.CurrentDirectory, fullScriptPath).Replace("\\", "\\\\");
-        scriptService.AddToGlobals("INCLUDE_PATH", relativeScriptPath);
+        scriptService.ConfigureStandardLibraries(relativeScriptPath);
     }
 }

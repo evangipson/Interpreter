@@ -17,4 +17,7 @@ public interface IScriptManager
 
     /// <inheritdoc cref="IScriptService.GetResultAsync"/>
     Task<TResult?> GetResultAsync<TResult>(string scriptRelativePath, IEnumerable<LuaValue>? arguments = null);
+
+    /// <inheritdoc cref="IScriptService.GetValuesFromTable"/>
+    Dictionary<LuaValue, LuaValue> GetValuesFromTable(LuaTable luaTable);
 }

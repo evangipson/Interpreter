@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Lua;
 using Lua.Standard;
-using System;
+using Lua.CodeAnalysis.Compilation;
+using Lua.Internal;
+using Lua.Runtime;
 
 namespace Interpreter.Logic.Services;
 
@@ -73,6 +75,48 @@ public class ScriptService(ILogger<ScriptService> logger) : IScriptService
         });
     }
 
+    public void ConfigureStandardLibraries(string path)
+    {
+        _luaState.OpenStandardLibraries();
+        _luaState.Environment["require"] = new LuaFunction("require", async (context, buffer, cancellationToken) =>
+        {
+            string arg0 = context.GetArgument<string>(0);
+            LuaTable loaded = context.State.LoadedModules;
+            if (!loaded.TryGetValue(arg0, out var value))
+            {
+                string sanitizedModuleName = arg0.Replace("\\", "\\\\").Replace("/", "\\\\").Replace(".", "\\\\");
+                LuaModule luaModule = await context.State.ModuleLoader.LoadAsync($"{path}\\{sanitizedModuleName}", cancellationToken);
+                Chunk proto = LuaCompiler.Default.Compile(luaModule.ReadText(), luaModule.Name);
+                using PooledArray<LuaValue> methodBuffer = new(1);
+                await new Closure(context.State, proto).InvokeAsync(context, methodBuffer.AsMemory(), cancellationToken);
+                value = methodBuffer[0];
+                loaded[arg0] = value;
+            }
+
+            buffer.Span[0] = value;
+            return 1;
+        });
+    }
+
+    public Dictionary<LuaValue, LuaValue> GetValuesFromTable(LuaTable luaTable)
+    {
+        if (!luaTable.Metatable?.TryGetValue("get_key", out LuaValue result) ?? false)
+        {
+            return [];
+        }
+
+        Dictionary<LuaValue, LuaValue> results = [];
+        for (var i = 1; i <= luaTable.HashMapCount; i++)
+        {
+            if (luaTable.TryGetNext(i, out KeyValuePair<LuaValue, LuaValue> keyValue))
+            {
+                results.Add(keyValue.Key, keyValue.Value);
+            }
+        }
+
+        return results;
+    }
+
     private async Task<TResult?> InvokeScriptAsync<TResult>(string scriptPath, IEnumerable<LuaValue>? arguments = null)
     {
         // Make sure the script exists before attempting to run it.
@@ -80,13 +124,6 @@ public class ScriptService(ILogger<ScriptService> logger) : IScriptService
         {
             logger.LogWarning(@$"{nameof(InvokeScriptAsync)}: Could not find the ""{scriptPath}"" lua script. Returning default value for {typeof(TResult)}.");
             return default;
-        }
-
-        // Add lua standard libraries once, and only once.
-        if (!_addedStandardLibraries)
-        {
-            _luaState.OpenStandardLibraries();
-            _addedStandardLibraries = true;
         }
 
         // Get the function from the lua file.

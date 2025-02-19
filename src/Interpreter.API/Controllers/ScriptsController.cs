@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Interpreter.Logic.Managers;
+using Lua;
 
 namespace Interpreter.API.Controllers;
 
@@ -17,12 +18,11 @@ public class ScriptsController(IScriptManager scriptManager) : ControllerBase
     [EndpointDescription("An example of a generic, synchronous call to any script with any number of arguments, and receiving a generic value.")]
     public dynamic? Run(string scriptRelativePath, [FromBody] IEnumerable<string>? arguments = null)
     {
-        if(arguments?.Any() == true)
-        {
-            return scriptManager.TryGetResult(scriptRelativePath, [.. arguments], out dynamic? argsResult) ? argsResult : default;
-        }
+        var result = arguments?.Any() == true
+            ? scriptManager.TryGetResult(scriptRelativePath, [.. arguments], out dynamic? argsResult) ? argsResult : default
+            : scriptManager.TryGetResult(scriptRelativePath, out dynamic? noArgResult) ? noArgResult : default;
 
-        return scriptManager.TryGetResult(scriptRelativePath, out dynamic? result) ? result : default;
+        return result;
     }
 
     [HttpPost]
@@ -30,9 +30,14 @@ public class ScriptsController(IScriptManager scriptManager) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [EndpointDescription("An example of a generic, asynchronous call to any script with any number of arguments, and receiving a task with a generic value.")]
-    public async Task<dynamic?> RunAsync(string scriptRelativePath, [FromBody] IEnumerable<string>? arguments = null) => arguments?.Any() == true
-        ? await scriptManager.GetResultAsync<dynamic>(scriptRelativePath, [.. arguments])
-        : await scriptManager.GetResultAsync<dynamic>(scriptRelativePath);
+    public async Task<dynamic?> RunAsync(string scriptRelativePath, [FromBody] IEnumerable<string>? arguments = null)
+    {
+        var result = arguments?.Any() == true
+            ? await scriptManager.GetResultAsync<dynamic>(scriptRelativePath, [.. arguments])
+            : await scriptManager.GetResultAsync<dynamic>(scriptRelativePath);
+
+        return result;
+    }
 
     [HttpGet]
     [Route("[action]")]

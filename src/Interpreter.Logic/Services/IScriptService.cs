@@ -87,4 +87,17 @@ public interface IScriptService
     /// The value of the lua entity to add to globals.
     /// </param>
     void AddToGlobals(string name, LuaValue value);
+
+    /// <summary>
+    /// Gets all keys and values from the provided <paramref name="luaTable"/>.
+    /// </summary>
+    /// <param name="luaTable">
+    /// The <see cref="LuaTable"/> to extract a collection of <see cref="LuaValue"/> from.
+    /// </param>
+    /// <returns>
+    /// A map of <see cref="LuaValue"/> keys and values from the <paramref name="luaTable"/>, defaults to an empty map.
+    /// </returns>
+    Dictionary<LuaValue, LuaValue> GetValuesFromTable(LuaTable luaTable);
+
+    void ConfigureStandardLibraries(string path);
 }

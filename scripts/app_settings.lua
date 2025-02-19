@@ -5,7 +5,8 @@ local app_settings = {
     version = "0.1.0",
     languages = { "C#", "lua" },
     environment = os_getenv("ASPNETCORE_ENVIRONMENT"),
-    path = SCRIPTS_PATH()
+    -- `Interpreter:ScriptsPath` is an environment variable created in IScriptManager in the backend
+    path = os_getenv("Interpreter:ScriptsPath")
 }
 
 return app_settings
