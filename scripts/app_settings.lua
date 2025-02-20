@@ -17,7 +17,7 @@ local app_settings_metatable = {
             '"path":"' .. type(self.path) .. '"' ..
         '}'
     end,
-    -- Get the JSON representation of a product
+    -- Get the JSON representation of app_settings
     tojson = function(self)
         return '{' ..
             '"name":"' .. self.name .. '",' ..
