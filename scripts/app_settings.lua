@@ -1,4 +1,5 @@
 local os_getenv = os.getenv
+local print_array = require('utils.print_array')
 
 local app_settings_metatable = {
     name = "",
@@ -14,7 +15,17 @@ local app_settings_metatable = {
             '"languages":"' .. type(self.languages) .. '",' ..
             '"environment":"' .. type(self.environment) .. '",' ..
             '"path":"' .. type(self.path) .. '"' ..
-            '}'
+        '}'
+    end,
+    -- Get the JSON representation of a product
+    tojson = function(self)
+        return '{' ..
+            '"name":"' .. self.name .. '",' ..
+            '"version":"' .. self.version .. '",' ..
+            '"languages":' .. print_array(self.languages) .. ',' ..
+            '"environment":"' .. self.environment .. '",' ..
+            '"path":"' .. self.path .. '"' ..
+        '}'
     end,
 }
 

@@ -24,7 +24,7 @@ local Product = {
             '"active":"' .. type(self.active) .. '",' ..
             '"price":"' .. type(self.price) .. '",' ..
             '"sale":"' .. type(self.sale) .. '"' ..
-            '}'
+        '}'
     end,
     -- Get the JSON representation of a product
     tojson = function(self)
@@ -33,7 +33,7 @@ local Product = {
             '"active":' .. (self.active and "true" or "false") .. ',' ..
             '"price":' .. self.price .. ',' ..
             '"sale":' .. self.sale ..
-            '}'
+        '}'
     end,
 }
 
