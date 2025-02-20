@@ -1,20 +1,39 @@
-﻿using Lua;
-
-using Interpreter.Logic.Services;
-
-namespace Interpreter.Logic.Managers;
+﻿namespace Interpreter.Logic.Managers;
 
 /// <summary>
 /// A manager that is responsible for loading and running scripts that are located in a directory defined in the application settings.
 /// </summary>
 public interface IScriptManager
 {
-    /// <inheritdoc cref="IScriptService.TryGetResult"/>
-    bool TryGetResult<TResult>(string scriptRelativePath, out TResult? result);
+    /// <summary>
+    /// Runs the script that lives at <paramref name="scriptRelativePath"/>, and passes along the
+    /// <paramref name="arguments"/> that are provided, then captures and returns the result as
+    /// a <see langword="dynamic"/> type.
+    /// </summary>
+    /// <param name="scriptRelativePath">
+    /// The path to the script to run, relative to the "ScriptSettings:Path" application setting.
+    /// </param>
+    /// <param name="arguments">
+    /// An optional collection of <see langword="string"/> arguments to provide the script.
+    /// </param>
+    /// <returns>
+    /// A <see langword="dynamic"/> script result, defaults to <see langword="null"/>.
+    /// </returns>
+    dynamic? Run(string scriptRelativePath, IEnumerable<string>? arguments = null);
 
-    /// <inheritdoc cref="IScriptService.TryGetResult"/>
-    bool TryGetResult<TResult>(string scriptRelativePath, IEnumerable<LuaValue> arguments, out TResult? result);
-
-    /// <inheritdoc cref="IScriptService.GetResultAsync"/>
-    Task<TResult?> GetResultAsync<TResult>(string scriptRelativePath, IEnumerable<LuaValue>? arguments = null);
+    /// <summary>
+    /// Runs the script that lives at <paramref name="scriptRelativePath"/> asynchronously, and
+    /// passes along the <paramref name="arguments"/> that are provided, then captures and returns
+    /// the result as <see cref="Task"/> with a <see langword="dynamic"/> type.
+    /// </summary>
+    /// <param name="scriptRelativePath">
+    /// The path to the script to run, relative to the "ScriptSettings:Path" application setting.
+    /// </param>
+    /// <param name="arguments">
+    /// An optional collection of <see langword="string"/> arguments to provide the script.
+    /// </param>
+    /// <returns>
+    /// A <see cref="Task"/> filled with a <see langword="dynamic"/> script result, defaults to <see langword="null"/>.
+    /// </returns>
+    Task<dynamic?> RunAsync(string scriptRelativePath, IEnumerable<string>? arguments = null);
 }

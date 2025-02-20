@@ -1,6 +1,5 @@
-﻿using Lua;
-
-using Interpreter.Logic.Services;
+﻿using Interpreter.Logic.Services;
+using Interpreter.Domain.Extensions;
 
 namespace Interpreter.Logic.Managers;
 
@@ -17,38 +16,30 @@ public class ScriptManager(ISettingsService settingsService, IScriptService scri
         }
     }
 
-    public bool TryGetResult<TResult>(string scriptRelativePath, out TResult? result)
+    public dynamic? Run(string scriptRelativePath, IEnumerable<string>? arguments = null)
     {
         var scriptPath = Path.Combine(ScriptPath, scriptRelativePath);
 
-        result = default;
-        if (!scriptService.TryGetResult(scriptPath, out TResult? scriptResult))
-        {
-            return false;
-        }
+        var result = arguments?.Any() == true
+            ? scriptService.TryGetResult(scriptPath, [.. arguments], out dynamic? argsResult) ? argsResult : default
+            : scriptService.TryGetResult(scriptPath, out dynamic? noArgResult) ? noArgResult : default;
 
-        result = scriptResult;
-        return true;
+        return result is string resultString
+            ? resultString.TryGetJsonObject()
+            : result;
     }
 
-    public bool TryGetResult<TResult>(string scriptRelativePath, IEnumerable<LuaValue> arguments, out TResult? result)
+    public async Task<dynamic?> RunAsync(string scriptRelativePath, IEnumerable<string>? arguments = null)
     {
         var scriptPath = Path.Combine(ScriptPath, scriptRelativePath);
 
-        result = default;
-        if(!scriptService.TryGetResult(scriptPath, arguments ?? [], out TResult? scriptResult))
-        {
-            return false;
-        }
+        var result = arguments?.Any() == true
+            ? await scriptService.GetResultAsync<dynamic>(scriptPath, [.. arguments])
+            : await scriptService.GetResultAsync<dynamic>(scriptPath);
 
-        result = scriptResult;
-        return true;
-    }
-
-    public Task<TResult?> GetResultAsync<TResult>(string scriptRelativePath, IEnumerable<LuaValue>? arguments = null)
-    {
-        var scriptPath = Path.Combine(ScriptPath, scriptRelativePath);
-        return scriptService.GetResultAsync<TResult>(scriptPath, arguments ?? []);
+        return result is string resultString
+            ? resultString.TryGetJsonObject()
+            : result;
     }
 
     private void AddPathInformationToGlobals()

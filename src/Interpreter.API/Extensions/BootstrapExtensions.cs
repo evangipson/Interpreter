@@ -52,10 +52,10 @@ internal static class BootstrapExtensions
             app.MapOpenApi();
             app.MapScalarApiReference(options =>
             {
-                options.WithTitle("Interpreter Api v1 Documentation");
-                options.WithLayout(ScalarLayout.Modern);
-                options.WithDarkMode(true);
-                options.WithSidebar(false);
+                options
+                    .WithTitle("Interpreter Api v1 Documentation")
+                    .WithTheme(ScalarTheme.BluePlanet)
+                    .WithSidebar(false);
             });
         }
 
@@ -66,8 +66,7 @@ internal static class BootstrapExtensions
         return app;
     }
 
-    private static WebApplicationBuilder AddConfigurationOptions(this WebApplicationBuilder builder) => builder
-        .BindOptions<ScriptSettings>();
+    private static WebApplicationBuilder AddConfigurationOptions(this WebApplicationBuilder builder) => builder.BindOptions<ScriptSettings>();
 
     private static WebApplicationBuilder BindOptions<T>(this WebApplicationBuilder builder) where T : class
     {
