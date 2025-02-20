@@ -4,6 +4,7 @@ using Lua.Standard;
 using Lua.CodeAnalysis.Compilation;
 using Lua.Internal;
 using Lua.Runtime;
+using System.Text.Json;
 
 namespace Interpreter.Logic.Services;
 

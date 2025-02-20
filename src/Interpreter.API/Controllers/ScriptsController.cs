@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Interpreter.Logic.Managers;
-using Lua;
+using Interpreter.Domain.Extensions;
 
 namespace Interpreter.API.Controllers;
 
@@ -22,7 +22,9 @@ public class ScriptsController(IScriptManager scriptManager) : ControllerBase
             ? scriptManager.TryGetResult(scriptRelativePath, [.. arguments], out dynamic? argsResult) ? argsResult : default
             : scriptManager.TryGetResult(scriptRelativePath, out dynamic? noArgResult) ? noArgResult : default;
 
-        return result;
+        return result is string resultString
+            ? resultString.TryGetJsonObject()
+            : result;
     }
 
     [HttpPost]
@@ -36,7 +38,9 @@ public class ScriptsController(IScriptManager scriptManager) : ControllerBase
             ? await scriptManager.GetResultAsync<dynamic>(scriptRelativePath, [.. arguments])
             : await scriptManager.GetResultAsync<dynamic>(scriptRelativePath);
 
-        return result;
+        return result is string resultString
+            ? resultString.TryGetJsonObject()
+            : result;
     }
 
     [HttpGet]
