@@ -1,11 +1,11 @@
 -- The definition for a product
 local Product = {
-	-- The name of the product
-	name = "",
-	-- The active status of the product
-	active = false,
-	-- The price of the product
-	price = 0,
+    -- The name of the product
+    name = "",
+    -- The active status of the product
+    active = false,
+    -- The price of the product
+    price = 0,
     -- The sale amount the product
     sale = 0,
     -- Display a product
@@ -24,7 +24,7 @@ local Product = {
             '"active":"' .. type(self.active) .. '",' ..
             '"price":"' .. type(self.price) .. '",' ..
             '"sale":"' .. type(self.sale) .. '"' ..
-        '}'
+            '}'
     end,
     -- Get the JSON representation of a product
     tojson = function(self)
@@ -33,7 +33,7 @@ local Product = {
             '"active":' .. (self.active and "true" or "false") .. ',' ..
             '"price":' .. self.price .. ',' ..
             '"sale":' .. self.sale ..
-        '}'
+            '}'
     end,
 }
 

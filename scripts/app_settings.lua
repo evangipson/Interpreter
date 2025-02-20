@@ -14,7 +14,7 @@ local app_settings_metatable = {
             '"languages":"' .. type(self.languages) .. '",' ..
             '"environment":"' .. type(self.environment) .. '",' ..
             '"path":"' .. type(self.path) .. '"' ..
-        '}'
+            '}'
     end,
 }
 
