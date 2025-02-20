@@ -8,7 +8,7 @@ local function get_config(config_key)
 
     local config_value = app_settings[config_key]
     if type(config_value) == "table" then
-        print_array(config_value)
+        return print_array(config_value)
     elseif config_value then
         return config_value
     end
