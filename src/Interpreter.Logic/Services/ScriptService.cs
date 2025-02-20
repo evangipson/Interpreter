@@ -4,7 +4,6 @@ using Lua.Standard;
 using Lua.CodeAnalysis.Compilation;
 using Lua.Internal;
 using Lua.Runtime;
-using System.Text.Json;
 
 namespace Interpreter.Logic.Services;
 
@@ -78,11 +77,20 @@ public class ScriptService(ILogger<ScriptService> logger) : IScriptService
 
     public void ConfigureStandardLibraries(string path)
     {
+        // open all standard libraries, which serves two purposes:
+        // 1. all lua scripts will have access to all standard library functions
+        // 2. it's now possilbe to override "require" with the new "relative" version
         _luaState.OpenStandardLibraries();
+
+        // override "require" with a relative /scripts/ folder-aware version
         _luaState.Environment["require"] = new LuaFunction("require", async (context, buffer, cancellationToken) =>
         {
+            // get the first argument (the provided path to require itself)
             string arg0 = context.GetArgument<string>(0);
+            // get all the loaded modules
             LuaTable loaded = context.State.LoadedModules;
+
+            // if there is no loaded module with the provided path, load it
             if (!loaded.TryGetValue(arg0, out var value))
             {
                 string sanitizedModuleName = arg0.Replace("\\", "\\\\").Replace("/", "\\\\").Replace(".", "\\\\");
@@ -94,40 +102,24 @@ public class ScriptService(ILogger<ScriptService> logger) : IScriptService
                 loaded[arg0] = value;
             }
 
+            // fill buffer with the loaded module
             buffer.Span[0] = value;
+
+            // return one value from "require", the module itself
             return 1;
         });
     }
 
-    public Dictionary<LuaValue, LuaValue> GetValuesFromTable(LuaTable luaTable)
-    {
-        if (!luaTable.Metatable?.TryGetValue("get_key", out LuaValue result) ?? false)
-        {
-            return [];
-        }
-
-        Dictionary<LuaValue, LuaValue> results = [];
-        for (var i = 1; i <= luaTable.HashMapCount; i++)
-        {
-            if (luaTable.TryGetNext(i, out KeyValuePair<LuaValue, LuaValue> keyValue))
-            {
-                results.Add(keyValue.Key, keyValue.Value);
-            }
-        }
-
-        return results;
-    }
-
     private async Task<TResult?> InvokeScriptAsync<TResult>(string scriptPath, IEnumerable<LuaValue>? arguments = null)
     {
-        // Make sure the script exists before attempting to run it.
+        // Make sure the script exists before attempting to run it
         if (!File.Exists(scriptPath))
         {
             logger.LogWarning(@$"{nameof(InvokeScriptAsync)}: Could not find the ""{scriptPath}"" lua script. Returning default value for {typeof(TResult)}.");
             return default;
         }
 
-        // Get the function from the lua file.
+        // Get the function from the lua file
         var results = await _luaState.DoFileAsync(scriptPath);
         if (results == null || results.Length == 0)
         {
@@ -139,7 +131,7 @@ public class ScriptService(ILogger<ScriptService> logger) : IScriptService
         // Determine what arguments will be sent based on the state of the provided "arguments"
         LuaValue[] funcArgs = arguments?.Any() == true ? [.. arguments] : [];
 
-        // Invoke the function and return the results.
+        // Invoke the function and return the results, and raise any lua exceptions that arise
         LuaValue[] funcResults = [];
         try
         {
@@ -157,12 +149,14 @@ public class ScriptService(ILogger<ScriptService> logger) : IScriptService
             return default;
         }
 
+        // If "nil" was returned, return the default value
         if (funcResults[0].Type == LuaValueType.Nil)
         {
             logger.LogWarning(@$"{nameof(InvokeScriptAsync)}: Received ""nil"" from ""{func.Name}()"" in ""{scriptPath}"".");
             return default;
         }
 
+        // Attempt to cast the result as the intended TResult
         if (!funcResults[0].TryRead(out TResult result))
         {
             logger.LogWarning(@$"{nameof(InvokeScriptAsync)}: Could not cast result from ""{func.Name}()"" in ""{scriptPath}"" as {typeof(TResult)}. Returning default value for {typeof(TResult)}.");

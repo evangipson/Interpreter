@@ -1,4 +1,4 @@
-local create_product = require('products.product')
+local create_product = require('products.create_product')
 
 local ticket = create_product("ticket", 11.99, 1.00)
 local child_ticket = create_product("child_ticket", 5.99)

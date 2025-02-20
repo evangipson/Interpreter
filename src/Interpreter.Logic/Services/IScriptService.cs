@@ -89,15 +89,10 @@ public interface IScriptService
     void AddToGlobals(string name, LuaValue value);
 
     /// <summary>
-    /// Gets all keys and values from the provided <paramref name="luaTable"/>.
+    /// Configures the standard libraries for lua, also overrides "require" with a special version that prepends the relative scripts path.
     /// </summary>
-    /// <param name="luaTable">
-    /// The <see cref="LuaTable"/> to extract a collection of <see cref="LuaValue"/> from.
+    /// <param name="path">
+    /// The relative path to the scripts to prepend "require" paths with.
     /// </param>
-    /// <returns>
-    /// A map of <see cref="LuaValue"/> keys and values from the <paramref name="luaTable"/>, defaults to an empty map.
-    /// </returns>
-    Dictionary<LuaValue, LuaValue> GetValuesFromTable(LuaTable luaTable);
-
     void ConfigureStandardLibraries(string path);
 }

@@ -51,8 +51,6 @@ public class ScriptManager(ISettingsService settingsService, IScriptService scri
         return scriptService.GetResultAsync<TResult>(scriptPath, arguments ?? []);
     }
 
-    public Dictionary<LuaValue, LuaValue> GetValuesFromTable(LuaTable luaTable) => scriptService.GetValuesFromTable(luaTable);
-
     private void AddPathInformationToGlobals()
     {
         // Don't set globals if they've already been set, i.e.: the script path has been loaded.
