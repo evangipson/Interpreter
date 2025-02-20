@@ -14,13 +14,18 @@ local JsonObject = {
     end,
     -- Gets a property by name
     get_prop = function(self, prop_name)
+        if prop_name == nil then
+            return "Cannot get property, no property name provided."
+        end
+
         local prop = self[prop_name]
         if type(prop) == "table" then
             return print_array(prop)
         elseif prop then
             return prop
         end
-        return "Cannot get property, no '" .. prop .. "' property exists."
+
+        return "Cannot get property, no '" .. prop_name .. "' property exists."
     end,
     -- Gets the schema of an object
     schema = function(self)
