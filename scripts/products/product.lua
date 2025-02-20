@@ -1,3 +1,5 @@
+local JsonObject = require('base.json_object')
+
 -- The definition for a product
 local Product = {
     -- The name of the product
@@ -17,24 +19,10 @@ local Product = {
         output = output .. '\t' .. 'sale: ' .. self.sale .. '\n'
         return tostring(output)
     end,
-    -- Gets the schema of a product
-    schema = function(self)
-        return '{' ..
-            '"name":"' .. type(self.name) .. '",' ..
-            '"active":"' .. type(self.active) .. '",' ..
-            '"price":"' .. type(self.price) .. '",' ..
-            '"sale":"' .. type(self.sale) .. '"' ..
-        '}'
-    end,
-    -- Get the JSON representation of a product
-    tojson = function(self)
-        return '{' ..
-            '"name":"' .. self.name .. '",' ..
-            '"active":' .. (self.active and "true" or "false") .. ',' ..
-            '"price":' .. self.price .. ',' ..
-            '"sale":' .. self.sale ..
-        '}'
-    end,
+    prop_count = JsonObject.prop_count,
+    get_prop = JsonObject.get_prop,
+    schema = JsonObject.schema,
+    tojson = JsonObject.tojson,
 }
 
 return Product

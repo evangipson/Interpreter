@@ -1,3 +1,5 @@
+local JsonObject = require('base.json_object')
+
 -- An account
 local Account = {
     -- The name of the account owner
@@ -20,6 +22,10 @@ local Account = {
     deposit = function(self, amount)
         self.balance = self.balance + amount
     end,
+    prop_count = JsonObject.prop_count,
+    get_prop = JsonObject.get_prop,
+    schema = JsonObject.schema,
+    tojson = JsonObject.tojson
 }
 
 return Account

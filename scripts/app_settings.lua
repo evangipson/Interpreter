@@ -1,5 +1,5 @@
 local os_getenv = os.getenv
-local print_array = require('utils.print_array')
+local JsonObject = require('base.json_object')
 
 local app_settings_metatable = {
     name = "",
@@ -7,26 +7,10 @@ local app_settings_metatable = {
     languages = {},
     environment = "",
     path = "",
-    -- Gets the schema of app_settings
-    schema = function(self)
-        return '{' ..
-            '"name":"' .. type(self.name) .. '",' ..
-            '"version":"' .. type(self.version) .. '",' ..
-            '"languages":"' .. type(self.languages) .. '",' ..
-            '"environment":"' .. type(self.environment) .. '",' ..
-            '"path":"' .. type(self.path) .. '"' ..
-        '}'
-    end,
-    -- Get the JSON representation of app_settings
-    tojson = function(self)
-        return '{' ..
-            '"name":"' .. self.name .. '",' ..
-            '"version":"' .. self.version .. '",' ..
-            '"languages":' .. print_array(self.languages) .. ',' ..
-            '"environment":"' .. self.environment .. '",' ..
-            '"path":"' .. self.path .. '"' ..
-        '}'
-    end,
+    prop_count = JsonObject.prop_count,
+    get_prop = JsonObject.get_prop,
+    schema = JsonObject.schema,
+    tojson = JsonObject.tojson,
 }
 
 local app_settings = setmetatable({
@@ -37,8 +21,7 @@ local app_settings = setmetatable({
     -- `Interpreter:ScriptsPath` is an environment variable created in IScriptManager in the backend
     path = os_getenv("Interpreter:ScriptsPath")
 }, {
-    __index = app_settings_metatable,
-    schema = app_settings_metatable.schema
+    __index = app_settings_metatable
 })
 
 return app_settings
