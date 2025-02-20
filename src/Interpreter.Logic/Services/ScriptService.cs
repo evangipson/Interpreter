@@ -11,7 +11,6 @@ namespace Interpreter.Logic.Services;
 public class ScriptService(ILogger<ScriptService> logger) : IScriptService
 {
     private readonly LuaState _luaState = LuaState.Create();
-    private bool _addedStandardLibraries = false;
 
     public bool TryGetResult<TResult>(string scriptPath, out TResult? result)
     {
