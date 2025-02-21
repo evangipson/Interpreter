@@ -1,4 +1,5 @@
 local Account = require('accounts.account')
+local JsonResponse = require('base.json_response')
 
 -- Creates an account and assigns the metatable
 local function create_account(owner_name, balance, number, as_json)
@@ -11,7 +12,7 @@ local function create_account(owner_name, balance, number, as_json)
     })
 
     if as_json then
-        return new_account:tojson()
+        return JsonResponse:ok(new_account:tojson())
     end
 
     return new_account

@@ -1,4 +1,5 @@
 local print_array = require('utils.print_array')
+local JsonResponse = require('base.json_response')
 
 -- A base object that defines a way to get schema and return JSON
 local JsonObject = {
@@ -15,17 +16,17 @@ local JsonObject = {
     -- Gets a property by name
     get_prop = function(self, prop_name)
         if prop_name == nil then
-            return "Cannot get property, no property name provided."
+            return JsonResponse:error("Cannot get property, no property name provided.")
         end
 
         local prop = self[prop_name]
         if type(prop) == "table" then
-            return print_array(prop)
+            return JsonResponse:ok(print_array(prop))
         elseif prop then
-            return prop
+            return JsonResponse:ok(prop)
         end
 
-        return "Cannot get property, no '" .. prop_name .. "' property exists."
+        return JsonResponse:error("Cannot get property, no '" .. prop_name .. "' property exists.")
     end,
     -- Gets the schema of an object
     schema = function(self)

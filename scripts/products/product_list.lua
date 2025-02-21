@@ -1,10 +1,13 @@
 local create_product = require('products.create_product')
+local JsonList = require('base.json_list')
 
-local ticket = create_product("ticket", 11.99, 1.00)
-local child_ticket = create_product("child_ticket", 5.99)
-local old_ticket = create_product("old_ticket", 14.99)
-local hamburger = create_product("hamburger", 7.99)
+-- A JsonList of all products
+local product_list = JsonList
 
-old_ticket.active = false
+-- Add dummy list of products to the product list
+product_list:add(create_product("ticket", 11.99, 1.00))
+product_list:add(create_product("child_ticket", 5.99))
+product_list:add(create_product("old_ticket", 14.99))
+product_list:add(create_product("hamburger", 7.99))
 
-return { ticket, child_ticket, old_ticket, hamburger }
+return product_list

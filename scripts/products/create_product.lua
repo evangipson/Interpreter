@@ -1,4 +1,5 @@
 local Product = require('products.product')
+local JsonResponse = require('base.json_response')
 
 -- Creates a product and assigns the metatable
 local function create_product(name, price, sale, active, as_json)
@@ -12,7 +13,7 @@ local function create_product(name, price, sale, active, as_json)
     })
 
     if as_json then
-        return new_product:tojson()
+        return JsonResponse:ok(new_product:tojson())
     end
 
     return new_product
