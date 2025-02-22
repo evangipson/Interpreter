@@ -73,7 +73,7 @@ Inside the [`scripts`](scripts/) directory, there are many directories and lua f
 The repo comes with a pre-packaged set of lua scripts that can be used for testing, and built upon or further customized, or removed completely:
 - [`config.lua`](scripts/config.lua): An example of an endpoint which returns one or many [application configurations](scripts/config/app_settings.lua) meant to be hit by the API
 - [`endpoints.lua`](scripts/endpoints.lua): An example of an endpoint which returns one or many [endpoints](scripts/endpoints/all_endpoints.lua) meant to be hit by the API
-- [`cache`](scripts/cache/): An example of [distributed](scripts/cache/distributed-cache.lua), [in-memory](scripts/cache/memory-cache.lua), [hybrid](scripts/cache/hybrid_cache.lua) caching, with a means to [set](scripts/cache/set_cache.lua) and [get](scripts/cache/get_cache.lua) cached values
+- [`cache`](scripts/cache/): An example of [distributed](scripts/cache/distributed-cache.lua), [in-memory](scripts/cache/memory-cache.lua), and [hybrid](scripts/cache/hybrid_cache.lua) caching, with a means to [set](scripts/cache/set_cache.lua) and [get](scripts/cache/get_cache.lua) cached values
     - [`config/app_settings.lua`](scripts/config/app_settings.lua) has a `cache` property which can be changed in real-time to change the cache strategy
 - [`base`](scripts/base/): An example of some base lua tables and metatables which allow json responses from lua to the backend
 - [`utils`](scripts/utils/): A collection of utility lua scripts used throughout the lua scripts
