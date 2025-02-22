@@ -19,7 +19,7 @@ The purpose is to mitigate the need to rebuild or redeploy the .NET application 
 
 ## Development
 - Ensure each lua script returns exactly one `function`, which will be invoked either via API or an injected [`IScriptManager`](src/Interpreter.Logic/Managers/IScriptManager.cs)
-- The `scripts` directory location can be customized from the application settings
+- The [`scripts`](scripts/) directory location can be customized from the application settings
     - Fill out [`the development app settings`](src/Interpreter.API/appsettings.Development.json) with the new path, either absolute or relative to [`the API root folder`](src/Interpreter.API/)
 - Change any lua script in the [`scripts`](scripts/) directory to change application logic in realtime
 - Create any new directories and lua scripts in the [`scripts`](scripts/) directory to extend application logic
