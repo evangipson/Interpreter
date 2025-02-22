@@ -3,21 +3,6 @@ A .NET 9 web api that attempts to defer as much business logic as possible to lu
 
 The purpose is to mitigate the need to rebuild or redeploy the .NET application in order to see changes in the output or logic of the appplication, and allow for higher speed of development.
 
-## Architecture
-### C#
-Inside the `src` directory, there are three projects in the .NET 9 backend:
-- `Interpreter.Domain`: Data models with no dependencies
-- `Interpreter.Logic`: Application logic, mostly to load and run lua scripts
-- `Interpreter.API`: Exposes the API and houses the application settings and bootstrap logic
-
-### Lua
-Inside the `scripts` directory, there are many directories and lua files which are invoked by the backend.
-
-The repo comes with a pre-packaged set of lua scripts that can be used for testing, and built upon or further customized, or removed completely.
-
-## Requirements
-- Visual Studio (at least version 17 to support .NET 9)
-
 ## Installation
 - Download the repo
 - Run `dotnet restore`
@@ -28,17 +13,17 @@ The repo comes with a pre-packaged set of lua scripts that can be used for testi
 - Use the existing `/scripts/run` or `/scripts/run-async` endpoints
     - The path to the script is in the form of the `scriptRelativePath` query parameter on the endpoint
     - Arguments to the scripts are provided in the form of a collection of string values in the POST body
-- Use a dependency injected `IScriptManager` to gain access to the `Run(string, IEnumerable<string>?)` and `RunAsync(string, IEnumerable<string>?)` methods
+- Use a dependency injected [`IScriptManager`](src/Interpreter.Logic/Managers/IScriptManager.cs) to gain access to the `Run(string, IEnumerable<string>?)` and `RunAsync(string, IEnumerable<string>?)` methods
     - The path to the script is the `string` parameter for both methods
     - Arguments to the scripts are provided as the `IEnumerable<string>?` parameter for both methods
 
 ## Development
-- Ensure each lua script returns exactly one `function`, which will be invoked either via API or an injected `IScriptManager`
+- Ensure each lua script returns exactly one `function`, which will be invoked either via API or an injected [`IScriptManager`](src/Interpreter.Logic/Managers/IScriptManager.cs)
 - The `scripts` directory location can be customized from the application settings
-    - Fill out `src\Interpreter.API\appsettings.Development.json` with the new path, either absolute or relative to `src\Interpreter.API`
-- Change any lua script in the `scripts` directory to change application logic in realtime
-- Create any new directories and lua scripts in the `scripts` directory to extend application logic
-    - Use the existing `/scripts/run` or `/scripts/run-async` endpoints or `IScriptManager.Run`/`IScriptManager.RunAsync` to run the new script
+    - Fill out [`the development app settings`](src/Interpreter.API/appsettings.Development.json) with the new path, either absolute or relative to [`the API root folder`](src/Interpreter.API/)
+- Change any lua script in the [`scripts`](scripts/) directory to change application logic in realtime
+- Create any new directories and lua scripts in the [`scripts`](scripts/) directory to extend application logic
+    - Use the existing `/scripts/run` or `/scripts/run-async` endpoints or [`IScriptManager`](src/Interpreter.Logic/Managers/IScriptManager.cs`) `Run()`/`RunAsync()` methods to run the new script
 
 ### Example Development Flow
 Create a new lua script: `scripts\numbers\subtract.lua`
@@ -54,7 +39,7 @@ Use the Scalar UI to call this new script via the API and get the results:
 
 ![A screenshot of Scalar being used to call the new numbers/subtract.lua script.](./assets/scalar-subtract-example.png)
 
-Or create a new controller to call this new script via a dependency injected `IScriptManager`, then use the Scalar UI to invoke the new endpoint and get the results:
+Or create a new controller to call this new script via a dependency injected [`IScriptManager`](src/Interpreter.Logic/Managers/IScriptManager.cs`), then use the Scalar UI to invoke the new endpoint and get the results:
 ```csharp
 using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
@@ -74,6 +59,25 @@ public class SubtractController(IScriptManager scriptManager) : ControllerBase
     public int? Subtract(int a, int b) => scriptManager.Run("numbers/subtract.lua", [$"{a}", $"{b}"]);
 }
 ```
+
+## Architecture
+### C#
+Inside the [`src`](src/) directory, there are three projects in the .NET 9 backend:
+- [`Interpreter.Domain`](src/Interpreter.Domain/): Data models with no dependencies
+- [`Interpreter.Logic`](src/Interpreter.Logic/): Application logic, mostly to load and run lua scripts
+- [`Interpreter.API`](src/Interpreter.API/): Exposes the API and houses the application settings and bootstrap logic
+
+### Lua
+Inside the [`scripts`](scripts/) directory, there are many directories and lua files which are invoked by the backend.
+
+The repo comes with a pre-packaged set of lua scripts that can be used for testing, and built upon or further customized, or removed completely:
+- [`config.lua`](scripts/config.lua): An example of an [application configuration](scripts/config/app_settings.lua) in lua, used throughout all the scripts for values related to the application
+- [`endpoints.lua`](scripts/endpoints.lua): An example of a [collection of endpoints](scripts/endpoints/all_endpoints.lua) meant to be hit by the API
+- [`cache`](scripts/cache/): An example of [distributed](scripts/cache/distributed-cache.lua) and [in-memory](scripts/cache/memory-cache.lua) caching, with a means to [set](scripts/cache/set_cache.lua) and [get](scripts/cache/get_cache.lua) cached values
+    - [`config.lua`](scripts/config.lua) has a `cache` property which can be changed in real-time to change the cache strategy
+- [`base`](scripts/base/): An example of some base lua tables and metatables which allow json responses from lua to the backend
+- [`utils`](scripts/utils/): A collection of utility lua scripts used throughout the lua scripts
+
 
 ## Run Scripts In Separate Programs
 It is also possible to call the API from an external system, as outlined in the following examples.
