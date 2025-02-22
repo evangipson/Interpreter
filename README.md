@@ -19,7 +19,7 @@ The purpose is to mitigate the need to rebuild or redeploy the .NET application 
 
 ## Development
 - Ensure each lua script returns exactly one `function`, which will be invoked either via API or an injected [`IScriptManager`](src/Interpreter.Logic/Managers/IScriptManager.cs)
-- The [`scripts`](scripts/) directory location can be customized from the application settings
+- The [`scripts`](scripts/) directory location can be customized from the backend's application settings
     - Fill out [`the development app settings`](src/Interpreter.API/appsettings.Development.json) with the new path, either absolute or relative to [`the API root folder`](src/Interpreter.API/)
 - Change any lua script in the [`scripts`](scripts/) directory to change application logic in realtime
 - Create any new directories and lua scripts in the [`scripts`](scripts/) directory to extend application logic
@@ -71,13 +71,12 @@ Inside the [`src`](src/) directory, there are three projects in the .NET 9 backe
 Inside the [`scripts`](scripts/) directory, there are many directories and lua files which are invoked by the backend.
 
 The repo comes with a pre-packaged set of lua scripts that can be used for testing, and built upon or further customized, or removed completely:
-- [`config.lua`](scripts/config.lua): An example of an [application configuration](scripts/config/app_settings.lua) in lua, used throughout all the scripts for values related to the application
-- [`endpoints.lua`](scripts/endpoints.lua): An example of a [collection of endpoints](scripts/endpoints/all_endpoints.lua) meant to be hit by the API
+- [`config.lua`](scripts/config.lua): An example of an endpoint which returns one or many [application configurations](scripts/config/app_settings.lua) meant to be hit by the API
+- [`endpoints.lua`](scripts/endpoints.lua): An example of an endpoint which returns one or many [endpoints](scripts/endpoints/all_endpoints.lua) meant to be hit by the API
 - [`cache`](scripts/cache/): An example of [distributed](scripts/cache/distributed-cache.lua) and [in-memory](scripts/cache/memory-cache.lua) caching, with a means to [set](scripts/cache/set_cache.lua) and [get](scripts/cache/get_cache.lua) cached values
-    - [`config.lua`](scripts/config.lua) has a `cache` property which can be changed in real-time to change the cache strategy
+    - [`config/app_settings.lua`](scripts/config/app_settings.lua) has a `cache` property which can be changed in real-time to change the cache strategy
 - [`base`](scripts/base/): An example of some base lua tables and metatables which allow json responses from lua to the backend
 - [`utils`](scripts/utils/): A collection of utility lua scripts used throughout the lua scripts
-
 
 ## Run Scripts In Separate Programs
 It is also possible to call the API from an external system, as outlined in the following examples.
