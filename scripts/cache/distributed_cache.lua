@@ -28,30 +28,64 @@ local DistributedCache = {
     end,
     -- Sets the `name` and `value` in the cache
     set = function(self, name, value)
-        local cache_file = self:get_cache_file('a')
-        if cache_file == nil then
-            self:close_cache_file()
-            return false
-        end
-
-        cache_file:write('\n' .. name .. '=')
-
-        local t = type(value)
-        if t == 'nil' then
-            cache_file:write('nil')
-        elseif t == 'number' then
-            cache_file:write(value)
-        elseif t == 'string' then
-            cache_file:write('"' .. value .. '"')
-        elseif t == 'table' then
-            local i, v = next(value, nil)
-            cache_file:write('{')
-            while i do
-                self:set(i, v)
-                cache_file:write(',')
-                i, v = next(value, i)
+        -- Update if it already exists
+        local cached_value = self:get(name)
+        if cached_value then
+            local cache_file = self:get_cache_file('r')
+            if cache_file == nil then
+                self:close_cache_file()
+                return false
             end
-            cache_file:write('}')
+
+            -- Find cache_key from the start of the line, using ^ to make sure the key is at the start of the line.
+            local search_string = "^" .. name .. "="
+            -- Read the whole cache file into memory
+            local cache_content = {}
+            local line_count = 1
+            local target_line = 0
+            for line in cache_file:lines() do
+                -- Try and find the cache_key from the start of the line
+                local start_index, _ = string_find(line, search_string)
+                if start_index then
+                    target_line = line_count
+                end
+                table_insert(cache_content, line)
+                line_count = line_count + 1
+            end
+            -- Update the correct line in the cache_content table
+            cache_content[target_line] = name .. '="' .. value .. '"'
+            -- Re-open the cache file in write mode
+            cache_file = self:get_cache_file('w')
+            -- Write the whole file back out
+            for _, cached_file_value in ipairs(cache_content) do
+                cache_file:write(cached_file_value .. '\n')
+            end
+        -- write it for the first time if it's new
+        else
+            local cache_file = self:get_cache_file('a')
+            if cache_file == nil then
+                self:close_cache_file()
+                return false
+            end
+
+            cache_file:write('\n' .. name .. '=')
+            local t = type(value)
+            if t == 'nil' then
+                cache_file:write('nil')
+            elseif t == 'number' then
+                cache_file:write(value)
+            elseif t == 'string' then
+                cache_file:write('"' .. value .. '"')
+            elseif t == 'table' then
+                local i, v = next(value, nil)
+                cache_file:write('{')
+                while i do
+                    self:set(i, v)
+                    cache_file:write(',')
+                    i, v = next(value, i)
+                end
+                cache_file:write('}')
+            end
         end
 
         -- force the buffer to flush to write the contents to disk

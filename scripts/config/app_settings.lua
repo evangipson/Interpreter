@@ -22,7 +22,7 @@ local app_settings = setmetatable({
     environment = os_getenv("ASPNETCORE_ENVIRONMENT"),
     -- `Interpreter:ScriptsPath` is an environment variable created in IScriptManager in the backend
     path = os_getenv("Interpreter:ScriptsPath"),
-    cache = require('cache.memory_cache'),
+    cache = require('cache.hybrid_cache'),
 }, {
     __index = app_settings_metatable
 })

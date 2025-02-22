@@ -12,6 +12,7 @@ local InMemoryCache = {
             self.cache_table = {}
         end
 
+        -- This will already update if it exists
         local t = type(value)
         if t == 'nil' then
             self.cache_table[name] = nil
