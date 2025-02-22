@@ -89,17 +89,16 @@ public class ScriptService(ILogger<ScriptService> logger) : IScriptService
             // get all the loaded modules
             LuaTable loaded = context.State.LoadedModules;
 
-            // if there is no loaded module with the provided path, load it
-            if (!loaded.TryGetValue(arg0, out var value))
-            {
-                string sanitizedModuleName = arg0.Replace("\\", "\\\\").Replace("/", "\\\\").Replace(".", "\\\\");
-                LuaModule luaModule = await context.State.ModuleLoader.LoadAsync($"{path}\\{sanitizedModuleName}", cancellationToken);
-                Chunk proto = LuaCompiler.Default.Compile(luaModule.ReadText(), luaModule.Name);
-                using PooledArray<LuaValue> methodBuffer = new(1);
-                await new Closure(context.State, proto).InvokeAsync(context, methodBuffer.AsMemory(), cancellationToken);
-                value = methodBuffer[0];
-                loaded[arg0] = value;
-            }
+            // always load the module instead of trying to cache it
+            LuaValue value;
+            string sanitizedModuleName = arg0.Replace("\\", "\\\\").Replace("/", "\\\\").Replace(".", "\\\\");
+            LuaModule luaModule = await context.State.ModuleLoader.LoadAsync($"{path}\\{sanitizedModuleName}", cancellationToken);
+            Chunk proto = LuaCompiler.Default.Compile(luaModule.ReadText(), luaModule.Name);
+
+            using PooledArray<LuaValue> methodBuffer = new(1);
+            await new Closure(context.State, proto).InvokeAsync(context, methodBuffer.AsMemory(), cancellationToken);
+            value = methodBuffer[0];
+            loaded[arg0] = value;
 
             // fill buffer with the loaded module
             buffer.Span[0] = value;
