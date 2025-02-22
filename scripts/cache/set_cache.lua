@@ -1,4 +1,4 @@
-local Cache = require('cache.cache')
+local Cache = require('config.app_settings').cache
 local JsonResponse = require('base.json_response')
 
 local function set_cache(key, val)

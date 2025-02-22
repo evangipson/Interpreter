@@ -7,6 +7,8 @@ local app_settings_metatable = {
     languages = {},
     environment = "",
     path = "",
+    -- Should be a require() to either memory or distributed cache
+    cache = "",
     prop_count = JsonObject.prop_count,
     get_prop = JsonObject.get_prop,
     schema = JsonObject.schema,
@@ -19,7 +21,8 @@ local app_settings = setmetatable({
     languages = { "C#", "lua" },
     environment = os_getenv("ASPNETCORE_ENVIRONMENT"),
     -- `Interpreter:ScriptsPath` is an environment variable created in IScriptManager in the backend
-    path = os_getenv("Interpreter:ScriptsPath")
+    path = os_getenv("Interpreter:ScriptsPath"),
+    cache = require('cache.memory_cache'),
 }, {
     __index = app_settings_metatable
 })

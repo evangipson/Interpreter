@@ -5,7 +5,7 @@ local get_kv_from_string = require('utils.get_kv_from_string')
 local string_to_table = require('utils.string_to_table')
 
 -- A base implementation of persistent storage by writing and reading a file
-local Cache = {
+local DistributedCache = {
     -- A reference to the file which holds the cache
     cache_file = nil,
     -- Closes the cache file if it's open
@@ -120,7 +120,7 @@ local Cache = {
                     return tonumber(value)
                 end
 
-                return value:gsub("\"", "")
+                return tostring(value)
             end
         end
 
@@ -129,4 +129,4 @@ local Cache = {
     end
 }
 
-return Cache
+return DistributedCache
