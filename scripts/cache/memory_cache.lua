@@ -1,4 +1,3 @@
-local string_find = string.find
 local table_insert = table.insert
 local get_kv_from_string = require('utils.get_kv_from_string')
 local string_to_table = require('utils.string_to_table')
