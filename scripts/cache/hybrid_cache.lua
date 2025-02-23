@@ -49,6 +49,13 @@ local HybridCache = {
         -- Otherwise, the cache value doesn't exist
         return nil
     end,
+    -- Removes a value from cache with the associated `cache_key`
+    remove = function(self, cache_key)
+        local removed_from_in_memory = InMemoryCache:remove(cache_key)
+        local removed_from_distributed_cache = DistributedCache:remove(cache_key)
+
+        return removed_from_in_memory and removed_from_distributed_cache
+    end,
 }
 
 return HybridCache

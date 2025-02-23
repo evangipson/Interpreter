@@ -20,6 +20,8 @@ local InMemoryCache = {
             self.cache_table[name] = tonumber(value)
         elseif t == 'string' then
             self.cache_table[name] = '"' .. value .. '"'
+        elseif t == 'table' then
+            self.cache_table[name] = value
         end
         return true
     end,
@@ -38,11 +40,14 @@ local InMemoryCache = {
             return nil
         end
 
-        -- extract the value with quotes
-        local value = cached_value:sub(1, -1)
+        -- extract the value with quotes if the cached value was a string
+        local value = cached_value
+        if type(cached_value) == 'string' then
+            value = cached_value:sub(1, -1)
+        end
 
-        -- Handle cached tables
-        if value:sub(2, 2) == '{' and value:sub(-2, -2) == '}' then
+        -- Handle tables represented as strings
+        if type(value) == 'string' and value:sub(2, 2) == '{' and value:sub(-2, -2) == '}' then
             local table_values = {}
 
             -- extract values from inside the '{' and '}', and trim leading and trailing whitespace
@@ -72,14 +77,29 @@ local InMemoryCache = {
             end
 
             return table_values
+        elseif type(value) == 'table' then
+            return value
         elseif value == "nil" then
             return nil
         elseif tonumber(value) then
             return tonumber(value)
         end
 
-        return tostring(value)
-    end
+        return value
+    end,
+    -- Removes a value from cache with the associated `cache_key`
+    remove = function(self, cache_key)
+        -- Look for the value in cache
+        local cached_value = self:get(cache_key)
+        -- If it didn't exist, it can't be removed
+        if cached_value == nil then
+            return false
+        end
+
+        -- Remove the value from cache
+        self.cache_table[cache_key] = nil
+        return true
+    end,
 }
 
 return InMemoryCache

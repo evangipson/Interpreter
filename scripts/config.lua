@@ -12,7 +12,11 @@ local function config(config_key)
         return JsonResponse:ok(app_settings:tojson())
     end
 
-    return JsonResponse:ok(app_settings:get_prop(config_key))
+    local config_prop = app_settings:get_prop(config_key)
+    if config_prop == nil then
+        return JsonResponse:error('Could not find "' .. config_key .. '" property in application settings.')
+    end
+    return JsonResponse:ok('"' .. config_prop .. '"')
 end
 
 return config

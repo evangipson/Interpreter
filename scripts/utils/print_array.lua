@@ -1,8 +1,11 @@
 local is_array = require('utils.is_array')
 
--- Returns a string representation of an array
-local function print_array(table)
-    local array_output = '['
+-- Returns a string representation of an array, or table if `as_table` is `true`
+local function print_array(table, as_table)
+    local print_as_table = as_table or false
+    local start_char = print_as_table and '{' or '['
+    local end_char = print_as_table and '}' or ']'
+    local array_output = start_char
     for i, v in ipairs(table) do
         if is_array(v) then
             array_output = array_output .. print_array(v)
@@ -19,7 +22,7 @@ local function print_array(table)
             array_output = array_output .. ','
         end
     end
-    return array_output .. ']'
+    return array_output .. end_char
 end
 
 return print_array

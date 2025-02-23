@@ -16,17 +16,17 @@ local JsonObject = {
     -- Gets a property by name
     get_prop = function(self, prop_name)
         if prop_name == nil then
-            return JsonResponse:error("Cannot get property, no property name provided.")
+            return nil
         end
 
         local prop = self[prop_name]
         if type(prop) == "table" then
-            return JsonResponse:ok(print_array(prop))
+            return print_array(prop)
         elseif prop then
-            return JsonResponse:ok(prop)
+            return prop
         end
 
-        return JsonResponse:error("Cannot get property, no '" .. prop_name .. "' property exists.")
+        return nil
     end,
     -- Gets the schema of an object
     schema = function(self)
